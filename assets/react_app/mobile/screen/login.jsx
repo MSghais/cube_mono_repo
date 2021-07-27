@@ -43,7 +43,7 @@ const login = ({ navigation, route, dispatch }) => {
                             if (auth.user.role && auth.user.role === 'ROLE_MODERATOR'
                                 
                                 && TokenManager.getRole(token) === 'ROLE_MODERATOR') {
-                                navigation.navigate('CommentsModeration')
+                                navigation.navigate('ResourceModeration')
 
                             }
                             navigation.navigate('MyRessources')

@@ -1,42 +1,50 @@
 
 import * as React from 'react';
 import { DataTable } from 'react-native-paper';
-
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-
-// import displayComment from './displayComment';
+import { actionsTypes, findRessources } from '../../services/myResourcesService';
 export const KEY_TOKEN = 'token'
 
-const ResourceModeration = ({ navigation, route, state }) => {
+const ResourceModeration = ({ dispatch }) => {
 
-    const resource = route.params.resource;
-    const handlePress = () => {
-        navigation.pop();
-    }
-
-
-    const resources = useSelector(state => state.resources)
+    const navigation = useNavigation()
+    const auth = useSelector(state => state.auth)
     console.log('auth', auth)
+    const [resources, setResources] = React.useState([])
+    React.useEffect(() => {
+        const fetchData = async () => {
+            const res = await findRessources()
+            console.log('res', res)
+            const resourcesData = res['hydra:member']
 
-    const [page, setPage] = React.useState < number > (0);
+            setResources(resourcesData)
+            dispatch({ type: actionsTypes.getResources, data: resourcesData })
+        }
+
+        fetchData()
+    }, [])
+    console.log('resources', resources)
+
+    const [page, setPage] = React.useState(0);
+    const optionsPerPage = [2, 4, 6]
     const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
 
     React.useEffect(() => {
         setPage(0);
     }, [itemsPerPage]);
 
-
-
-
+    if (auth.user.role !== 'ROLE_MODERATOR') {
+        navigation.navigate('Resource')
+    }
     return (
         <DataTable>
             <DataTable.Header>
-                <DataTable.Title>Dessert</DataTable.Title>
-                <DataTable.Title numeric>Calories</DataTable.Title>
+                <DataTable.Title>Title</DataTable.Title>
+                <DataTable.Title numeric>Username</DataTable.Title>
+                <DataTable.Title numeric>Type</DataTable.Title>
+                <DataTable.Title numeric>Public</DataTable.Title>
                 <DataTable.Title numeric>Fat</DataTable.Title>
             </DataTable.Header>
 
@@ -45,14 +53,17 @@ const ResourceModeration = ({ navigation, route, state }) => {
 
                 </View>
 
-                : resources.data.resources.map((resource) => {
+                // : resources.data.resources.map((resource) => {
+                : resources.map((resource) => {
 
-                    <View key={ }>
+
+                    <View key={resource.id}>
 
                         <DataTable.Row>
-                            <DataTable.Cell>Frozen yogurt</DataTable.Cell>
-                            <DataTable.Cell numeric>159</DataTable.Cell>
-                            <DataTable.Cell numeric>6.0</DataTable.Cell>
+                            <DataTable.Cell>{resource.title}</DataTable.Cell>
+                            <DataTable.Cell>{resource.author.firstName}</DataTable.Cell>
+                            <DataTable.Cell>{resource.type.label}</DataTable.Cell>
+                            <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
                         </DataTable.Row>
 
 
@@ -61,12 +72,11 @@ const ResourceModeration = ({ navigation, route, state }) => {
 
             }
 
-
-            <DataTable.Row>
+            {/* <DataTable.Row>
                 <DataTable.Cell>Ice cream sandwich</DataTable.Cell>
                 <DataTable.Cell numeric>237</DataTable.Cell>
                 <DataTable.Cell numeric>8.0</DataTable.Cell>
-            </DataTable.Row>
+            </DataTable.Row> */}
 
             <DataTable.Pagination
                 page={page}

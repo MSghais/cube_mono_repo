@@ -8,7 +8,7 @@ export const KEY_TOKEN = 'token'
 export function loginAuth(credentials, dispatch) {
     // export function loginAuth(credentials) {
     return axios
-        .post("http://192.168.0.16:8002/api/login_check", credentials)
+        .post("http://192.168.43.94:8002/api/login_check", credentials)
         .then(response =>
             // console.log('res^p,se', response.data)
             response.data
@@ -39,7 +39,7 @@ export function getUser(token) {
 
     return axios
         // .get("http://192.168.0.16:8002/api/user", token)
-        .get("http://192.168.0.16:8002/api/user")
+        .get("http://192.168.43.94:8002/api/user")
 
         .then(response =>
             // console.log('res^p,se', response.data)
@@ -50,7 +50,7 @@ export function getUser(token) {
             try {
                 console.log('data user', data)
                 AsyncStorage.setItem("USER_ID", data.user.id)
-            
+
                 return data.user
                 // return dispatch({
                 //     type: "SET_USER",
@@ -93,6 +93,7 @@ export async function initialisation() {
 
 
 
+
 export async function isAuth() {
     const token = await AsyncStorage.getItem(KEY_TOKEN)
     if (token && token.length > 0 && _tokenIsValid(token)) {
@@ -129,4 +130,59 @@ function _tokenIsValid(token) {
     }
 
     return false
+}
+
+
+// export const isStorageToken = async (dispatch) => {
+export const isStorageToken = async (dispatch) => {
+
+    const token = await AsyncStorage.getItem(KEY_TOKEN)
+    console.log('token', token)
+    if (typeof token == 'string' && token && token.length > 0 && _tokenIsValid(token)) {
+        _setAxiosToken(token)
+        loginAuth(data).then((response) => {
+            AsyncStorage.getItem(KEY_TOKEN).then((token) => {
+                console.log("token are : ", token)
+                if (token) {
+                    setToken(token)
+
+                    getUser(token).then((user) => {
+                        console.log("user are : ", user)
+                        const auth = {
+                            token,
+                            user: {
+                                id: user.id,
+                                username: user.username,
+                                firstname: user.firstname,
+                                lastname: user.lastname,
+                                role: TokenManager.getRole(token),
+                                email: user.email
+                            }
+                        }
+                        console.log("auth ", auth)
+                        dispatch({ type: "SET_AUTH", auth });
+
+                        if (auth.user.role && auth.user.role === 'ROLE_MODERATOR'
+
+                            && TokenManager.getRole(token) === 'ROLE_MODERATOR') {
+                            navigation.navigate('ResourceModeration')
+
+                        }
+                        navigation.navigate('MyRessources')
+
+
+                    }).catch(error => {
+                        console.log('error get user', error)
+                        alert(error)
+                    })
+                }
+
+            }).catch(err => {
+                console.log('error get token storage', err)
+                alert(err)
+            })
+        })
+
+    }
+
 }

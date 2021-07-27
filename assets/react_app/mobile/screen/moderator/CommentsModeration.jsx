@@ -12,9 +12,8 @@ import { createComment } from "../../services/commentService";
 // import displayComment from './displayComment';
 export const KEY_TOKEN = 'token'
 
-const CommentModeration = ({ navigation, route, state }) => {
+const CommentModeration = ({  }) => {
 
-    const resource = route.params.resource;
     const handlePress = () => {
         navigation.pop();
     }
@@ -22,50 +21,6 @@ const CommentModeration = ({ navigation, route, state }) => {
 
     const auth = useSelector(state => state.auth)
     console.log('auth', auth)
-    const _retrieveToken = async () => {
-        try {
-            const token = await AsyncStorage.getItem(KEY_TOKEN);
-            return token;
-        } catch (error) {
-            // Error retrieving data
-        }
-    };
-
-    const token = _retrieveToken().then(res => res)
-    console.log('token in resource detail', token)
-
-    const [content, setContent] = React.useState('')
-    const [comment, setComment] = React.useState({
-        // content: content,
-        content,
-        resource: { value: `/api/resources/${resource.id}` },
-        createdAt: { value: new Date() },
-        parentComment: { value: "" },
-        userEntity: { value: "" },
-    })
-
-    const handleSubmit = () => {
-        console.log('content', content)
-        let commentToSend = {
-            // content: comment.content.value,
-            content: content,
-            resource: comment.resource.value,
-            createdAt: comment.createdAt.value,
-            userEntity: `api/users/201`,
-            // userEntity: `api/users/${AuthHandler.user.id}`,
-            // parentComment: commentId ? `api/comments/${commentId}` : null
-        }
-
-        console.log(commentToSend)
-        createComment(commentToSend).then(res => {
-            if (res.status === 201) {
-                //commentId ? onCloseModal(): null
-                // refresh()
-                // resetComment()
-            }
-        })
-    }
-
     const [page, setPage] = React.useState < number > (0);
     const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
 

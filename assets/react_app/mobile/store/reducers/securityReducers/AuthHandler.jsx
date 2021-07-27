@@ -4,36 +4,44 @@
  */
 
 const initialState = {
-	token: null, user: null
+	token: null, user: null, loading: false
 }
 
 function AuthHandler(state = initialState, action) {
 	let nextState
 	let newStateData
-	switch(action.type) {
+	switch (action.type) {
 		case 'RESET_AUTH':
 			return initialState;
 
+		case 'LOADING':
+			nextState = { ...state, loading: true }
+			return nextState;
+
+
+		case 'UNLOADING':
+			nextState = { ...state, loading: true }
+			return nextState;
 		case 'RESET_TOKEN':
-			nextState = {...state, token: null}
+			nextState = { ...state, token: null }
 			return nextState;
 
 		case 'RESET_USER':
-			nextState = {...state, user: null}
+			nextState = { ...state, user: null }
 			return nextState;
-		
+
 		case 'SET_AUTH':
-			nextState = {...state, token: action.auth.token, user: action.auth.user}
+			nextState = { ...state, token: action.auth.token, user: action.auth.user }
 			return nextState;
 
 		case 'SET_TOKEN':
-			nextState = {...state, token: action.token}
+			nextState = { ...state, token: action.token }
 			return nextState;
 
 		case 'SET_USER':
-			nextState = {...state, user: action.user}
+			nextState = { ...state, user: action.user }
 			return nextState;
-			
+
 		default:
 			return state;
 	}
