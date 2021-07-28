@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, Button } from "react-native";
 
-const ModalConfirm = ({handleModerate}) => {
+const ModalConfirm = ({id, handleModerate}) => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.centeredView}>

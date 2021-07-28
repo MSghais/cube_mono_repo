@@ -6,7 +6,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screen/login';
 import { initialisation, loginAuth, isAdmin, isAuth, isStorageToken, KEY_TOKEN, logoutAuth, _tokenIsValid, _setAxiosToken, getUser } from '../services/authService';
-import MyRessources from '../screen/ResourcesDisplay';
+import MyRessources from '../screen/Ressources';
 
 import Ressource from '../component/ResourceDetail';
 import UserProfil from '../screen/userProfil';

@@ -7,16 +7,22 @@ import { useNavigation } from '@react-navigation/native';
 import { resourcesTypes, findRessources, moderateResource } from '../../services/myResourcesService';
 import TokenManager from '../../services/security/TokenManager';
 import ModalConfirm from '../../component/modal/ModalConfirm';
+import { _tokenIsValid } from '../../services/authService';
 export const KEY_TOKEN = 'token'
 
 const ResourceModeration = ({ dispatch }) => {
 
     const navigation = useNavigation()
-    const token = auth.token
     // reducers 
     const auth = useSelector(state => state.auth)
     const resources = useSelector(state => state.resource)
+
+    //loader
+    if (auth.loading) {
+        return <ActivityIndicator />
+    }
     //    check if token are 
+    const token = auth.token
     if (!token
         || token.length === 0
         || !auth.user
@@ -28,37 +34,51 @@ const ResourceModeration = ({ dispatch }) => {
 
     console.log('auth', auth)
     const [resourcesState, setResources] = React.useState([])
-    const [redirection, setRedirection] = useState(false)
+    const [redirection, setRedirection] = React.useState(false)
 
     const handleModerate = (id, bool) => {
-        moderateResource({ resource_id: id, bool }, token).then(res => {
-            console.log(res)
-            setRedirection(true)
-        })
+        console.log('auth token', auth.token)
+        console.log('id resource', id)
+
+        if (TokenManager.getRole(auth.token) == "ROLE_MODERATOR" && auth.user.role == "ROLE_MODERATOR" && auth.token && TokenManager.isModerator(auth.token) && _tokenIsValid(auth.token)) {
+            moderateResource({ resource_id: id, bool }, auth.token).then(res => {
+                console.log(res)
+                // setRedirection(true)
+            })
+        }
+        else {
+            alert('Fuck of  ')
+        }
+
     }
 
     // if(redirection) return (<Redirect to="/moderation/resources" />)
 
     // if(redi)
 
-    React.useEffect(() => {
-        const fetchData = async () => {
-            dispatch({ type: resourcesTypes.loading })
-            const res = await findRessources()
-            console.log('res', res)
-            const resourcesData = res['hydra:member']
+    // React.useEffect(() => {
+    //     const fetchData = async () => {
+    //         dispatch({ type: resourcesTypes.loading })
+    //         const res = await findRessources()
+    //         console.log('res', res)
+    //         const resourcesData = res['hydra:member']
 
-            setResources(resourcesData)
-            dispatch({ type: resourcesTypes.getResources, data: resourcesData })
-            dispatch({ type: resourcesTypes.unload })
+    //         setResources(resourcesData)
+    //         dispatch({ type: resourcesTypes.getResources, data: resourcesData })
+    //         dispatch({ type: resourcesTypes.unload })
 
-        }
-        fetchData()
-    }, [])
+    //     }
+    //     fetchData()
+    // }, [])
 
     console.log('resources', resources)
 
     const [page, setPage] = React.useState(0);
+    const [opensModalConfirmRow, setOpenModal] = React.useState([]);
+
+    const [openConfirm, setOpenConfirm] = React.useState(false);
+    const [modalIndex, setModalIndex] = React.useState(0);
+
     const optionsPerPage = [2, 4, 6]
     const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
 
@@ -67,26 +87,33 @@ const ResourceModeration = ({ dispatch }) => {
     }, [itemsPerPage]);
 
 
+    if (resources.loading) {
+        return <ActivityIndicator />
+    }
+
     return (
+
+
+
+
 
         <View>
 
-            {/* 
-            <ScrollView
-                style={styles.main}
 
-            > */}
-            {/* {resources.loading && <ActivityIndicator />} */}
+
 
             <DataTable>
                 <DataTable.Header>
                     <DataTable.Title>Title</DataTable.Title>
                     <DataTable.Title numeric>Username</DataTable.Title>
-                    <DataTable.Title >Manage</DataTable.Title>
                     <DataTable.Title numeric>Type</DataTable.Title>
                     <DataTable.Title numeric>Public</DataTable.Title>
+                    <DataTable.Title numeric>Validé</DataTable.Title>
+                    <DataTable.Title >Manage</DataTable.Title>
+
                     {/* <DataTable.Title numeric>Fat</DataTable.Title> */}
                 </DataTable.Header>
+                {resources.loading && <ActivityIndicator />}
 
                 {resources.data.length === 0 ?
                     <View>
@@ -94,42 +121,68 @@ const ResourceModeration = ({ dispatch }) => {
                     </View>
 
                     // : resourcesState.map((resource) => {
-                    : resources.data.map((resource) => {
-                        console.log('resource to display', resource)
-
+                    : resources.data.map((resource, index) => {
+                        // console.log('resource to display', resource)
                         const id = resource.id
-                        const row = (
-                            <DataTable.Row>
-                                <DataTable.Cell>{resource.title}</DataTable.Cell>
+                        console.log('resource id ', id)
 
-                                <DataTable.Cell>
-                                    <Button onPress={() => <ModalConfirm handleModerate={(id) => handleModerate(id)} />}>
-                                        Open
-                                    </Button>
-                                </DataTable.Cell>
-                                <DataTable.Cell>{resource.author && resource.author.firstName}</DataTable.Cell>
-
-
-                                <View>
-                                    <DataTable.Cell color="secondary" variant="contained">
-                                        <Button onPress={() => handleModerate(false)}>
-                                            Refuser
-                                        </Button>
-                                    </DataTable.Cell>
-
-
-                                    <DataTable.Cell color="primary" onClick={() => handleModerate(true)} variant="contained">
-                                        <Button onPress={() => handleModerate(true)}>
-                                            Valider
-                                        </Button>
-                                    </DataTable.Cell>
-                                </View>
-
-                                <DataTable.Cell>{resource.type.label}</DataTable.Cell>
-                                <DataTable.Cell>{resource.type && resource.type.label}</DataTable.Cell>
-                                <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
-                            </DataTable.Row>
+                        const textModal = (
+                            <Text>
+                                {modalIndex == index && openConfirm ? "Close" : "Open"}
+                            </Text>
                         )
+
+                        const row = (
+
+                            <View>
+
+                                <DataTable.Row>
+                                    <DataTable.Cell>{resource.title}</DataTable.Cell>
+                                    <DataTable.Cell>{resource.author && resource.author.firstName}</DataTable.Cell>
+
+                                    <DataTable.Cell>{resource.type.label}</DataTable.Cell>
+                                    <DataTable.Cell>{resource.type && resource.type.label}</DataTable.Cell>
+                                    <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
+                                    <DataTable.Cell>{resource.isValidated ? "Validé" : "Invisible"}</DataTable.Cell>
+
+                                    <View style={styles.manageResource}>
+
+                                        <DataTable.Cell>
+                                            {/* <Button onPress={() => <ModalConfirm handleModerate={(id) => handleModerate(id)} />}> */}
+                                            {/* <Button onPress={() => setOpenModal(opensModalConfirmRow[index] = opensModalConfirmRow[index])}> */}
+                                            <Button onPress={() => {
+                                                setOpenConfirm(openConfirm)
+                                                setModalIndex(index)
+                                            }}>
+
+                                                {textModal}
+                                            </Button>
+                                        </DataTable.Cell>
+
+                                        <DataTable.Cell color="secondary" variant="contained">
+                                            <Button onPress={() => handleModerate(id, false)}>
+                                                Refuser
+                                            </Button>
+                                        </DataTable.Cell>
+
+
+                                        <DataTable.Cell color="primary" onClick={() => handleModerate(id, true)} variant="contained">
+                                            <Button onPress={() => handleModerate(true)}>
+                                                Valider
+                                            </Button>
+                                        </DataTable.Cell>
+                                    </View>
+                                </DataTable.Row>
+                                {
+                                    openConfirm && modalIndex == index &&
+                                    <ModalConfirm 
+                                    id={id}
+                                    handleModerate={(id) => handleModerate(id)} />
+                                }
+                            </View>
+                        )
+
+
                         return row
 
                     })
@@ -176,6 +229,10 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: 'bold',
         textAlign: 'left',
+    },
+
+    manageResource: {
+        flex: 1, margin: 40, borderRadius: 10, flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: '#FFF', backgroundColor: '#FFF'
     },
 
     TextInput: {

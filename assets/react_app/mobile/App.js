@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider, useSelector } from "react-redux";
 import configureStore from "./store/configureStore";
 import AppNavigator from './router';
-import Router from './Router';
+import Router from './Navigator';
 
 
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
