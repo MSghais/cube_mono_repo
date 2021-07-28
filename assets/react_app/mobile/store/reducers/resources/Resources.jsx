@@ -3,7 +3,7 @@
  * date: 22/01/2021
  */
 
-import { actionsTypes } from "../../../services/myResourcesService";
+import { resourcesTypes } from "../../../services/myResourcesService";
 
 const initialState = {
 	data: [],
@@ -16,18 +16,15 @@ function ResourcesState(state = initialState, action) {
 	let nextState
 	let newStateData
 	switch(action.type) {
-
-		case actionsTypes.loading:
+		case resourcesTypes.unload:
+			nextState = { ...state, loading: false }
+			return nextState;
+		case resourcesTypes.loading:
 			const loadingState = {...state, loading:true}
 			return loadingState;
-
-		case actionsTypes.getResources:
-			// nextState = {...state, token: action.auth.token, user: action.auth.user}
-			nextState = {...state, data: action.data, loading:true}
-
+		case resourcesTypes.getResources:
+			nextState = {...state, data: action.data, loading:false}
 			return nextState;
-
-
 
 		default:
 			return state;

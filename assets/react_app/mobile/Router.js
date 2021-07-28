@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button, StyleSheet, View, ActivityIndicator, } from 'react-native';
 import { connect } from 'react-redux';
@@ -6,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from './screen/login';
 import { initialisation, isAdmin, isAuth, isStorageToken, KEY_TOKEN, logoutAuth } from './services/authService';
-import MyRessources from './screen/myRessources';
+import MyRessources from './screen/ResourcesDisplay';
 
 import Ressource from './component/ResourceDetail';
 import UserProfil from './screen/userProfil';

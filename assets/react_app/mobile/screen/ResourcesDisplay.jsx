@@ -1,53 +1,39 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { Button, FlatList, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ImageBackground } from 'react-native'
+import { Button, FlatList, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ImageBackground, ActivityIndicator } from 'react-native'
 import { KEY_TOKEN, logoutAuth } from '../services/authService'
 import ResourcesCard from '../component/ResourcesCard'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { connect } from 'react-redux';
-
-import { findRessources, actionsTypes } from '../services/myResourcesService'
+import { connect, useSelector } from 'react-redux';
+import { findRessources, resourcesTypes } from '../services/myResourcesService'
 
 
+const ResourcesDisplay = ({ navigation, route, token, dispatch, props }) => {
 
+    const [resourcesData, setResources] = useState([])
+    const [loader, setLoader] = useState(true)
 
-const myRessources = ({ navigation, route, token, dispatch , props}) => {
+    const auth = useSelector(state => state.auth)
+    const resource = useSelector(state => state.resource)
 
-    const [resources, setResources] = useState([])
-
-
-    // React.useEffect(() => {
-    //     const init = async () => {
-    //       let res = await ResourceRepository.getResourceList();
-    //       console.log(res);
-    //       const newResource = res.data["hydra:member"];
-    //       setResources(newResource);
-    //     }
-    //     init()
-
-    //   }, [])
     useEffect(() => {
         const fetchData = async () => {
             const res = await findRessources()
-            console.log('res',res)
-            const resourcesData =  res['hydra:member']
+            dispatch({ type: resourcesTypes.loading })
 
+            console.log('res', res)
+            const resourcesData = res['hydra:member']
             setResources(resourcesData)
-            dispatch({type:actionsTypes.getResources, data:resourcesData })
+            setLoader(false)
+            dispatch({ type: resourcesTypes.getResources, data: resourcesData })
+
         }
 
         fetchData()
     }, [])
-    console.log(resources)
+    console.log(resource)
 
-
-    const onPress = () => {
-        console.log(resources)
-        //navigation.navigate('Resource', { resource: resource })
-    }
-    token = AsyncStorage.getItem(KEY_TOKEN)
-    //const navigation = useNavigation();
+    // if(resource.loading) {
+    //     return <ActivityIndicator/>
+    // }
 
     const logout = () => {
         console.log("adios")
@@ -58,20 +44,23 @@ const myRessources = ({ navigation, route, token, dispatch , props}) => {
         navigation.navigate('Login')
     }
 
+    console.log('loader', loader)
+
     return (
+
         <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
+
             <View style={styles.container}>
-                {/* {console.log('RENDER', films)} */}
                 <Text style={styles.titre}>
                     Ressources
                 </Text>
 
                 <ScrollView>
 
-                    {resources.length === 0
-                        ? <Text > Aucune ressource disponible </Text>
+                    {resource.data.length === 0
+                        ? <Text style={styles.titre} > Aucune ressource disponible </Text>
                         : <FlatList
-                            data={resources}
+                            data={resource.data}
                             keyExtractor={item => item.nom}
                             renderItem={({ item }) => <ResourcesCard
                                 user={token}
@@ -81,11 +70,26 @@ const myRessources = ({ navigation, route, token, dispatch , props}) => {
                     }
 
                 </ScrollView>
+                {/* <ScrollView>
+
+                    {resource.data.length === 0
+                        ? <Text style={styles.titre} > Aucune ressource disponible </Text>
+                        : <FlatList
+                            data={resource.data}
+                            keyExtractor={item => item.nom}
+                            renderItem={({ item }) => <ResourcesCard
+                                user={token}
+                                resource={item} navigation={navigation}
+                            />}
+                        />
+                    }
+
+                </ScrollView> */}
 
 
-                {typeof token == 'string' &&
-                    token &&
-                    token.length > 0 &&
+                {typeof auth.token == 'string' &&
+                    auth.token &&
+                    auth.token.length > 0 &&
                     <View style={styles.espace}>
                         <TouchableOpacity onPress={logout} style={styles.loginBtn}>
                             <Text style={styles.loginText}>Se Déconnecter</Text>
@@ -107,7 +111,7 @@ const mapStateToProps = state => ({
 });
 
 
-export default connect(mapStateToProps)(myRessources)
+export default connect(mapStateToProps)(ResourcesDisplay)
 
 const styles = StyleSheet.create({
     container: {

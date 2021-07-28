@@ -4,42 +4,21 @@ import { DataTable } from 'react-native-paper';
 import { connect, useSelector } from 'react-redux';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput, ActivityIndicator, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-import { resourcesTypes, findRessources, moderateResource } from '../../services/myResourcesService';
-import TokenManager from '../../services/security/TokenManager';
-import ModalConfirm from '../../component/modal/ModalConfirm';
+import { resourcesTypes, findRessources } from '../../services/myResourcesService';
 export const KEY_TOKEN = 'token'
 
 const ResourceModeration = ({ dispatch }) => {
 
     const navigation = useNavigation()
-    const token = auth.token
-    // reducers 
     const auth = useSelector(state => state.auth)
     const resources = useSelector(state => state.resource)
-    //    check if token are 
-    if (!token
-        || token.length === 0
-        || !auth.user
-        || auth.user.role !== 'ROLE_MODERATOR'
-        || TokenManager.getRole(token) !== 'ROLE_MODERATOR'
-    ) {
-        navigation.navigate('Resource')
-    }
-
     console.log('auth', auth)
     const [resourcesState, setResources] = React.useState([])
-    const [redirection, setRedirection] = useState(false)
-
-    const handleModerate = (id, bool) => {
-        moderateResource({ resource_id: id, bool }, token).then(res => {
-            console.log(res)
-            setRedirection(true)
-        })
+    if (!auth.token ||
+        auth.token.length === 0 ||
+        auth.user.role !== 'ROLE_MODERATOR') {
+        navigation.navigate('Resource')
     }
-
-    // if(redirection) return (<Redirect to="/moderation/resources" />)
-
-    // if(redi)
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -69,73 +48,103 @@ const ResourceModeration = ({ dispatch }) => {
 
     return (
 
-        <View>
-
-            {/* 
-            <ScrollView
-                style={styles.main}
-
-            > */}
-            {/* {resources.loading && <ActivityIndicator />} */}
+        <ScrollView>
+            {resources.loading && <ActivityIndicator />}
 
             <DataTable>
                 <DataTable.Header>
                     <DataTable.Title>Title</DataTable.Title>
                     <DataTable.Title numeric>Username</DataTable.Title>
-                    <DataTable.Title >Manage</DataTable.Title>
                     <DataTable.Title numeric>Type</DataTable.Title>
                     <DataTable.Title numeric>Public</DataTable.Title>
                     {/* <DataTable.Title numeric>Fat</DataTable.Title> */}
                 </DataTable.Header>
 
-                {resources.data.length === 0 ?
+                {resourcesState.length === 0 ?
                     <View>
                         <Text> No ressources to manage </Text>
                     </View>
 
-                    // : resourcesState.map((resource) => {
-                    : resources.data.map((resource) => {
-                        console.log('resource to display', resource)
+                    // : resources.data.resources.map((resource) => {
+                    : resourcesState.map((resource) => {
 
-                        const id = resource.id
-                        const row = (
-                            <DataTable.Row>
-                                <DataTable.Cell>{resource.title}</DataTable.Cell>
+                        <View key={resource.id}>
 
-                                <DataTable.Cell>
-                                    <Button onPress={() => <ModalConfirm handleModerate={(id) => handleModerate(id)} />}>
-                                        Open
-                                    </Button>
-                                </DataTable.Cell>
-                                <DataTable.Cell>{resource.author && resource.author.firstName}</DataTable.Cell>
+                            <View>
+                                <Text>{resource.title}</Text>
+                                <Text>{resource.author.firstName}</Text>
+                                <Text>{resource.type.label}</Text>
+                                <Text>{resource.isPublic ? "Public" : "In process"}</Text>
+                            </View>
 
+                        </View>
 
-                                <View>
-                                    <DataTable.Cell color="secondary" variant="contained">
-                                        <Button onPress={() => handleModerate(false)}>
-                                            Refuser
-                                        </Button>
-                                    </DataTable.Cell>
+                        // <View key={resource.id}>
 
+                        // <DataTable.Row>
+                        //     <DataTable.Cell>{resource.title}</DataTable.Cell>
+                        //     <DataTable.Cell>{resource.author.firstName}</DataTable.Cell>
+                        //     <DataTable.Cell>{resource.type.label}</DataTable.Cell>
+                        //     <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
+                        // </DataTable.Row>
 
-                                    <DataTable.Cell color="primary" onClick={() => handleModerate(true)} variant="contained">
-                                        <Button onPress={() => handleModerate(true)}>
-                                            Valider
-                                        </Button>
-                                    </DataTable.Cell>
-                                </View>
-
-                                <DataTable.Cell>{resource.type.label}</DataTable.Cell>
-                                <DataTable.Cell>{resource.type && resource.type.label}</DataTable.Cell>
-                                <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
-                            </DataTable.Row>
-                        )
-                        return row
-
+                        // </View>
                     })
 
                 }
 
+                {/* {resources.data.length === 0 ?
+                    <View>
+                        <Text> No ressources to manage </Text>
+                    </View>
+
+                    // : resources.data.resources.map((resource) => {
+                    : resources.data.map((resource) => {
+
+                        // <View key={resource.id}>
+
+                        <DataTable.Row>
+                            <DataTable.Cell>{resource.title}</DataTable.Cell>
+                            <DataTable.Cell>{resource.author.firstName}</DataTable.Cell>
+                            <DataTable.Cell>{resource.type.label}</DataTable.Cell>
+                            <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
+                        </DataTable.Row>
+
+                        // </View>
+                    })
+
+                } */}
+
+
+                {/* {resources.length === 0 ?
+                <View>
+
+                </View>
+
+                // : resources.data.resources.map((resource) => {
+                : resources.map((resource) => {
+
+
+                    <View key={resource.id}>
+
+                        <DataTable.Row>
+                            <DataTable.Cell>{resource.title}</DataTable.Cell>
+                            <DataTable.Cell>{resource.author.firstName}</DataTable.Cell>
+                            <DataTable.Cell>{resource.type.label}</DataTable.Cell>
+                            <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
+                        </DataTable.Row>
+
+
+                    </View>
+                })
+
+            } */}
+
+                {/* <DataTable.Row>
+                <DataTable.Cell>Ice cream sandwich</DataTable.Cell>
+                <DataTable.Cell numeric>237</DataTable.Cell>
+                <DataTable.Cell numeric>8.0</DataTable.Cell>
+            </DataTable.Row> */}
 
                 <DataTable.Pagination
                     page={page}
@@ -150,9 +159,8 @@ const ResourceModeration = ({ dispatch }) => {
                 />
             </DataTable>
 
-            {/* </ScrollView> */}
+        </ScrollView>
 
-        </View>
 
     )
 }
@@ -170,7 +178,6 @@ export default connect(mapStateToProps)(ResourceModeration)
 
 const styles = StyleSheet.create({
     main: { flex: 1, margin: 40, borderRadius: 10, flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: '#FFF', backgroundColor: '#FFF' },
-    row: { flex: 1, margin: 40, borderRadius: 10, flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: '#FFF', backgroundColor: '#FFF' },
 
     attributeLabel: {
         fontSize: 11,

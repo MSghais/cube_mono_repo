@@ -4,12 +4,15 @@ import { Button, ImageBackground, TextInput, TouchableOpacity, StyleSheet, Text,
 import { loginAuth, KEY_TOKEN, logoutAuth, getUser } from '../services/authService'
 import TokenManager from '../services/security/TokenManager'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native'
 
 
-const login = ({ navigation, route, dispatch }) => {
+const login = ({  route, dispatch }) => {
     const [email, setEmail] = useState('')
     const [pwd, setPwd] = useState('')
     const [token, setToken] = useState(null)
+
+    const navigation = useNavigation()
 
     const handleSubmit = () => {
 
