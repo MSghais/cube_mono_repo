@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screen/login';
-import { initialisation, isAdmin, isAuth, isStorageToken, KEY_TOKEN, logoutAuth, getUser } from '../services/authService';
+import { initialisation, isAdmin, isAuth, KEY_TOKEN, logoutAuth, getUser, _tokenIsValid } from '../services/authService';
 import MyRessources from '../screen/DisplayResources';
 
 import Ressource from '../component/ResourceDetail';
@@ -26,9 +26,21 @@ const Navigator = ({ dispatch }) => {
 
     const token = await AsyncStorage.getItem(KEY_TOKEN)
     console.log('token loadStorageToken', token)
+    if (
+      // !auth.token ||
+      //  typeof auth.token != 'string' || 
+      !token || token.length == 0 || typeof token != 'string') {
+      alert("Please reconnect you")
+    } 
+    else if(auth.token && auth.user ) {
+      alert("Hiii brother")
+    }
+    else if (
 
-    if (!auth.token || typeof auth.token != 'string'
-      && auth.loading && token && token.length > 0 && _tokenIsValid(token)) {
+      token && token.length > 0
+      && !TokenManager.isExpired(token)
+      && _tokenIsValid(token) 
+      ) {
       // dispatch({ type: "LOADING", auth });
       getUser(token).then((user) => {
         console.log("user are : ", user)

@@ -8,6 +8,7 @@ import { resourcesTypes, findRessources, moderateResource } from '../../services
 import TokenManager from '../../services/security/TokenManager';
 import ModalConfirm from '../../component/modal/ModalConfirm';
 import { _tokenIsValid } from '../../services/authService';
+import ContainerModeration from '../../component/container/Moderation';
 export const KEY_TOKEN = 'token'
 
 const ResourceModeration = ({ dispatch }) => {
@@ -45,18 +46,13 @@ const ResourceModeration = ({ dispatch }) => {
         setResourceIndex(id)
     }
 
-
-
-
     const handleModerate = (id, bool) => {
         console.log('auth token', auth.token)
         console.log('id resource', id)
         console.log('bool for moderation : isValidated or !isValidated && !isPublic', bool)
-        // setNeedUpdate(true)
         if (TokenManager.getRole(auth.token) == "ROLE_MODERATOR" && auth.user.role == "ROLE_MODERATOR" && auth.token && TokenManager.isModerator(auth.token) && _tokenIsValid(auth.token)) {
             moderateResource({ resource_id: id, bool }, auth.token).then(res => {
                 console.log(res)
-                // setRedirection(true)
             })
         }
         else {
@@ -66,20 +62,14 @@ const ResourceModeration = ({ dispatch }) => {
     }
 
     console.log('resources', resources)
-
-    // if(redirection) return (<Redirect to="/moderation/resources" />)
-
-    // if(redi)
-
-
-
-    const [page, setPage] = React.useState(0);
-    const [opensModalConfirmRow, setOpenModal] = React.useState([]);
-
+    const [page, setPage] = React.useState(0)
+    // view moderation container
     const [openConfirm, setOpenConfirm] = React.useState(false);
+    // view content of one ressources
     const [openContentsResource, setOpenContentsResource] = React.useState(false);
     const [modalIndex, setModalIndex] = React.useState(0);
 
+    // for pagination after if needed ?
     const optionsPerPage = [2, 4, 6]
     const [itemsPerPage, setItemsPerPage] = React.useState(optionsPerPage[0]);
 
@@ -87,130 +77,10 @@ const ResourceModeration = ({ dispatch }) => {
         setPage(0);
     }, [itemsPerPage]);
 
-
     if (resources.loading) {
         return <ActivityIndicator />
     }
 
-    const containerModerationRendering = (resource) => {
-        const id = resource.id
-
-        return (
-
-
-            <View style={styles.containerModeration}>
-
-                <Text>
-                    Moderation container
-                </Text>
-
-                <View>
-                    <Text>{resource.title} </Text>
-                    <Text>{resource.type.label} </Text>
-                </View>
-
-                {/* View content of the article */}
-                <View>
-                    <TouchableOpacity
-                        onPress={() => setOpenContentsResource(!openContentsResource)}
-                        style={styles.btnForDelete}
-                    >
-                        <Text style={styles.loginText}>View content</Text>
-                    </TouchableOpacity>
-
-                </View>
-
-                {openContentsResource && openConfirm &&
-                    resource.content && resource.content.length > 0 &&
-                    <View>
-                        {resource.content.map((cont) => [
-                            <View>
-                                {cont.attribute && cont.attribute.label && <Text styles={styles.attributeLabel}> {cont.attribute.label}  :  </Text>}
-                                <Text styles={styles.textValue}> {cont.textValue}</Text>
-                            </View>
-                        ])}
-
-                    </View>
-
-                }
-
-                <View style={styles.manageResource}>
-                    <Button
-                        style={styles.btnIsNotValidated}
-                        onPress={() => handleModerate(id, false)}>
-
-                        <Text
-                            style={styles.txtButton}>
-                            Refuser
-                        </Text>
-                    </Button>
-
-
-
-                    <Button
-                        style={styles.btnIsNotValidated}
-                        onPress={() => handleModerate(id, true)}>
-
-                        <Text
-                            style={styles.txtButton}>
-                            Valider
-                        </Text>
-                    </Button>
-
-                    {/* Delete button */}
-                    <View style={styles.espace}>
-                        <TouchableOpacity
-                            onPress={() => handleModerate(id, false)}
-                            style={styles.btnIsNotValidated}
-                        >
-                            <Text style={styles.loginText}>Refus&</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Validation button */}
-                    <View style={styles.espace}>
-                        <TouchableOpacity
-                            onPress={() => handleModerate(id, true)}
-                            style={styles.btnIsValidated}
-                        >
-                            <Text style={styles.loginText}>Validation</Text>
-                        </TouchableOpacity>
-                    </View>
-
-
-                </View>
-
-                <View>
-                    <Button
-                        style={styles.btnIsNotValidated}
-                        onPress={() => handleModerate(id, true)}
-                    >
-
-                        <Text
-                            style={styles.txtButton}>
-                            Delete
-                        </Text>
-                    </Button>
-
-
-                    {/* Delete button */}
-                    <View style={styles.espace}>
-                        <TouchableOpacity
-                            onPress={() => handleModerate(id, true)}
-                            style={styles.btnForDelete}
-                        >
-                            <Text style={styles.loginText}>Se Déconnecter</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
-
-
-
-            </View >
-        )
-
-    }
 
     return (
 
@@ -279,7 +149,14 @@ const ResourceModeration = ({ dispatch }) => {
                                     &&
                                     <View>
                                         <Text> Container de modération</Text>
-                                        {containerModerationRendering(resource)}
+                                        {/* {containerModerationRendering(resource)} */}
+                                        <ContainerModeration 
+                                        setOpenContentsResource={setOpenContentsResource}
+                                        openContentsResource={openContentsResource}
+                                        resource={resource}
+                                        openConfirm={openConfirm}
+                                        handleModerate={handleModerate}
+                                        />
                                     </View>}
 
                             </View>
@@ -429,29 +306,29 @@ const styles = StyleSheet.create({
 
 
     btnIsNotValidated: {
-        width: 50,
-        position: "absolute",
+        width: 60,
+        // position: "absolute",
         top: 10,
         left: 15,
-        borderRadius: 25,
+        // borderRadius: 25,
         height: 50,
-        alignItems: "flex-start",
-        justifyContent: "center",
+        // alignItems: "flex-start",
+        // justifyContent: "center",
         // marginTop: 40,
-        backgroundColor: "#FFA831",
+        backgroundColor: "#97161b",
     },
 
     btnIsValidated: {
-        width: 50,
-        position: "absolute",
+        width: 60,
+        // position: "absolute",
         top: 10,
         right: 15,
         borderRadius: 25,
         height: 50,
-        alignItems: "center",
-        justifyContent: "center",
+        // alignItems: "center",
+        // justifyContent: "center",
         // marginTop: 40,
-        backgroundColor: "#FFA831",
+        backgroundColor: "#4b6113",
     },
 
     btnForDelete: {

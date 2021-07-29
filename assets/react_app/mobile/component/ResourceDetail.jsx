@@ -3,9 +3,10 @@ import React from 'react'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
-import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { createComment } from "../services/commentService";
+import { moderateResource } from "../services/myResourcesService";
 import CommentDisplay from './CommentDisplay';
 import FormComment from './FormComment';
 import TokenHandler from '../services/security/TokenManager';
@@ -29,7 +30,13 @@ const ResourceDetail = ({ navigation, route, state }) => {
     const handleModerate = (id, bool) => {
         console.log('auth token', auth.token)
         console.log('id resource', id)
-        if (TokenManager.getRole(auth.token) == "ROLE_MODERATOR" && auth.user.role == "ROLE_MODERATOR" && auth.token && TokenManager.isModerator(auth.token) && _tokenIsValid(auth.token)) {
+        if (
+            auth.token
+            && auth.user.role == "ROLE_MODERATOR"
+            && TokenHandler.getRole(auth.token) == "ROLE_MODERATOR"
+            && TokenHandler.isModerator(auth.token)
+            && _tokenIsValid(auth.token)
+        ) {
             moderateResource({ resource_id: id, bool }, auth.token).then(res => {
                 console.log(res)
             })
@@ -103,7 +110,7 @@ const ResourceDetail = ({ navigation, route, state }) => {
 
     return (
         <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
-            <View style={styles.main}>
+            <ScrollView style={styles.main}>
 
                 <View style={styles.topLeft}>
 
@@ -177,7 +184,7 @@ const ResourceDetail = ({ navigation, route, state }) => {
                     </View>
                 </TouchableOpacity>
 
-            </View>
+            </ScrollView>
         </ImageBackground>
     )
 }
