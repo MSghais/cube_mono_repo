@@ -3,18 +3,18 @@ import { Button, StyleSheet, View, ActivityIndicator, } from 'react-native';
 import { connect } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Login from './screen/login';
-import { initialisation, isAdmin, isAuth, isStorageToken, KEY_TOKEN, logoutAuth, getUser } from './services/authService';
-import MyRessources from './screen/Ressources';
+import Login from '../screen/login';
+import { initialisation, isAdmin, isAuth, isStorageToken, KEY_TOKEN, logoutAuth, getUser } from '../services/authService';
+import MyRessources from '../screen/DisplayResources';
 
-import Ressource from './component/ResourceDetail';
-import UserProfil from './screen/userProfil';
+import Ressource from '../component/ResourceDetail';
+import UserProfil from '../screen/userProfil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider, useSelector } from "react-redux";
-import configureStore from "./store/configureStore";
-import CommentsModeration from './screen/moderator/CommentsModeration';
-import ResourceModeration from './screen/moderator/ResourceModeration';
-import TokenManager from './services/security/TokenManager';
+import configureStore from "../store/configureStore";
+import CommentsModeration from '../screen/moderator/CommentsModeration';
+import ResourceModeration from '../screen/moderator/ResourceModeration';
+import TokenManager from '../services/security/TokenManager';
 
 const Navigator = ({ dispatch }) => {
 

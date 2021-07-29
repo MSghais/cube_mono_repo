@@ -91,16 +91,78 @@ const ResourceModeration = ({ dispatch }) => {
         return <ActivityIndicator />
     }
 
+    const containerModerationRendering = (resource) => {
+        const id = resource.id
+
+        return (
+
+
+            <View style={styles.containerModeration}>
+
+                <Text>
+                    Moderation container
+                </Text>
+
+
+                <View style={styles.manageResource}>
+                    <Button
+                        style={styles.btnIsNotValidated}
+                        onPress={() => handleModerate(id, false)}>
+
+                        <Text
+                            style={styles.txtButton}>
+                            Refuser
+                        </Text>
+                    </Button>
+
+
+
+                    <Button
+                        style={styles.btnIsNotValidated}
+                        onPress={() => handleModerate(id, true)}>
+
+                        <Text
+                            style={styles.txtButton}>
+                            Valider
+                        </Text>
+                    </Button>
+                </View>
+
+                <View>
+                    <Button
+                        style={styles.btnIsNotValidated}
+                        onPress={() => handleModerate(id, true)}
+                    >
+
+                        <Text
+                            style={styles.txtButton}>
+                            Delete
+                        </Text>
+                    </Button>
+
+
+                    {/* Delete button */}
+                    <View style={styles.espace}>
+                        <TouchableOpacity
+                            onPress={() => handleModerate(id, true)}
+                            style={styles.btnForDelete}
+                        >
+                            <Text style={styles.loginText}>Se Déconnecter</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+
+
+            </View>
+        )
+
+    }
+
     return (
 
-
-
-
-
         <View>
-
-
-
 
             <DataTable>
                 <DataTable.Header>
@@ -113,7 +175,7 @@ const ResourceModeration = ({ dispatch }) => {
 
                     {/* <DataTable.Title numeric>Fat</DataTable.Title> */}
                 </DataTable.Header>
-                {resources.loading && <ActivityIndicator />}
+                {/* {resources.loading && <ActivityIndicator />} */}
 
                 {resources.data.length === 0 ?
                     <View>
@@ -132,29 +194,7 @@ const ResourceModeration = ({ dispatch }) => {
                             </Text>
                         )
 
-                        const containerModerationRendering = (resource) => (
 
-                            <View style={styles.manageResource}>
-
-
-                                <DataTable.Cell color="secondary" variant="contained">
-                                    <Button
-                                        style={styles.btnIsNotValidated}
-                                        onPress={() => handleModerate(id, false)}>
-                                        Refuser
-                                    </Button>
-                                </DataTable.Cell>
-
-
-                                <DataTable.Cell color="primary" onClick={() => handleModerate(id, true)} variant="contained">
-                                    <Button
-                                        style={styles.btnIsValidated}
-                                        onPress={() => handleModerate(id, true)}>
-                                        Valider
-                                    </Button>
-                                </DataTable.Cell>
-                            </View>
-                        )
 
                         const row = (
 
@@ -169,36 +209,13 @@ const ResourceModeration = ({ dispatch }) => {
                                     <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
                                     <DataTable.Cell>{resource.isValidated ? "Validé" : "Invisible"}</DataTable.Cell>
 
-                                    <View style={styles.manageResource}>
 
-
-                                        <DataTable.Cell color="secondary" variant="contained">
-                                            <Button
-                                                style={styles.btnIsNotValidated}
-                                                onPress={() => handleModerate(id, false)}>
-                                                Refuser
-                                            </Button>
-                                        </DataTable.Cell>
-
-
-                                        <DataTable.Cell color="primary" onClick={() => handleModerate(id, true)} variant="contained">
-                                            <Button
-                                                style={styles.btnIsValidated}
-                                                onPress={() => handleModerate(id, true)}>
-                                                Valider
-                                            </Button>
-                                        </DataTable.Cell>
-                                    </View>
                                 </DataTable.Row>
+
                                 {
-                                    openConfirm && modalIndex == index &&
-                                    <ModalConfirm
-                                        id={id}
-                                        handleModerate={(id) => handleModerate(id)} />
+                                    containerModerationRendering(resource)
                                 }
-                                {openConfirm && modalIndex == index &&
-                                    containerModeration(resource.data[modalIndex])
-                                }
+
                             </View>
                         )
 
@@ -222,8 +239,6 @@ const ResourceModeration = ({ dispatch }) => {
                     optionsLabel={'Rows per page'}
                 />
             </DataTable>
-
-            {/* </ScrollView> */}
 
         </View>
 
@@ -251,15 +266,48 @@ const styles = StyleSheet.create({
         textAlign: 'left',
     },
 
-    manageResource: {
-        flex: 1, margin: 40, borderRadius: 10, flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: '#FFF', backgroundColor: '#FFF'
+    containerModeration: {
+        // flex: 1, 
+        margin: 40,
+        borderRadius: 10,
+        flexDirection: 'column',
+        // display:"flex",
+        display: 'flex',
+
+        alignItems: 'center',
+        textAlign: 'center',
+        color: '#FFF',
+        backgroundColor: '#FFF'
     },
+
+    manageResource: {
+        // flex: 1, 
+        margin: 40,
+        borderRadius: 10,
+        flexDirection: "row",
+
+        // display:"flex",
+        display: 'flex',
+
+        alignItems: 'center',
+        textAlign: 'center',
+        color: '#FFF',
+        backgroundColor: '#FFF'
+    },
+
+
 
     TextInput: {
         height: 50,
         flex: 1,
         padding: 10,
         marginLeft: 20,
+    },
+
+    txtButton: {
+        textAlign: 'center',
+        fontSize: 8
+
     },
 
     textValue: {
@@ -318,20 +366,39 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
-        // backgroundColor: "#FFA831",
         backgroundColor: "red",
-
+        position: "absolute",
+        top: 10,
+        left: 15,
+        textAlign: 'left',
     },
 
     btnIsValidated: {
-        // width: "120%",
+        width: 50,
+        left: 1,
         borderRadius: 25,
         height: 50,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
-        // backgroundColor: "#FFA891",
+        position: "absolute",
+        top: 10,
+        right: 15,
+        textAlign: 'right',
         backgroundColor: "blue",
 
     },
+
+
+
+    btnForDelete: {
+        width: "80%",
+        borderRadius: 25,
+        height: 50,
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 40,
+        backgroundColor: "#FFA831",
+    },
+
 })

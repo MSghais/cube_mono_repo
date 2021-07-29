@@ -59,7 +59,7 @@ const ResourcesDisplay = ({ navigation, route, token, dispatch, props }) => {
                 <Text style={styles.titre}>
                     Ressources
                 </Text>
-                {resourcesData.length === 0 || resource.loading || !resourcesData  &&
+                { !resourcesData  || resourcesData.length === 0 || resource.loading &&
 
                     <View>
                         <ActivityIndicator />

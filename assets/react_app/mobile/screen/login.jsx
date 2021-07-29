@@ -74,7 +74,7 @@ const login = ({  route, dispatch }) => {
 
     return (
         <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
-            {console.log('RENDER', email, pwd, token)}
+            {/* {console.log('RENDER', email, pwd, token)} */}
             <View style={styles.container}>
 
                 <Text style={styles.titre}>Bienvenue</Text>
