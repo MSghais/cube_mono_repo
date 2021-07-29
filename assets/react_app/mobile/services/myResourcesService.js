@@ -1,22 +1,40 @@
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import TokenManager from './security/TokenManager'
-
 export const resourcesTypes = {
     getResources: "GET_RESOURCES",
     loading: "LOADING_RESOURCES",
     unload: "UNLOADING"
 }
+
+// export const findRessources = (credentials) => {
 export function findRessources(credentials) {
+
+    // dispatch({ type: resourcesTypes.loading })
+
     return axios
         .get("http://192.168.43.94:8002/api/resources", credentials)
         .then(response => response.data)
+      
         .catch(err => {
             return {
-                status:500,
-                message:err
+                status: 500,
+                message: err
             }
         });
 }
+
+// export function findRessources(credentials) {
+//     return axios
+//         .get("http://192.168.43.94:8002/api/resources", credentials)
+//         .then(response => response.data)
+//         .catch(err => {
+//             return {
+//                 status:500,
+//                 message:err
+//             }
+//         });
+// }
 
 export function getCommmentsResource(resourceId) {
     console.log(resourceId)
@@ -26,8 +44,8 @@ export function getCommmentsResource(resourceId) {
         .then(response => response.data)
         .catch(err => {
             return {
-                status:500,
-                message:err
+                status: 500,
+                message: err
             }
         });;
 }
@@ -45,8 +63,14 @@ export function moderateResource(body, token) {
         .then(response => response.data)
         .catch(err => {
             return {
-                status:500,
-                message:err
+                status: 500,
+                message: err
             }
         });
 }
+
+// module.exports = {
+//     moderateResource,
+//     getCommmentsResource,
+//     findRessources
+// }

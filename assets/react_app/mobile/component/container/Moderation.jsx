@@ -5,15 +5,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-import { createComment } from "../services/commentService";
-import CommentDisplay from './CommentDisplay';
-import FormComment from './FormComment';
-import TokenHandler from '../services/security/TokenManager';
+import { createComment } from "../../services/commentService";
+import CommentDisplay from '../CommentDisplay';
+import FormComment from '../FormComment';
+import TokenHandler from '../../services/security/TokenManager';
 
 // import displayComment from './displayComment';
 export const KEY_TOKEN = 'token'
 
-const ResourceDetail = ({ navigation, route, state }) => {
+const ModerationContainer = ({ navigation, resource }) => {
 
     const resource = route.params.resource;
     const handlePress = () => {

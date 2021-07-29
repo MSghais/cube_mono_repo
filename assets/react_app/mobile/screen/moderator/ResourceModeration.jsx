@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { DataTable } from 'react-native-paper';
 import { connect, useSelector } from 'react-redux';
-import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput, ActivityIndicator, ScrollView } from 'react-native'
+import { Image, StyleSheet, Text, Picker, TouchableOpacity, View, Button, ImageBackground, TextInput, ActivityIndicator, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { resourcesTypes, findRessources, moderateResource } from '../../services/myResourcesService';
 import TokenManager from '../../services/security/TokenManager';
@@ -35,11 +35,24 @@ const ResourceModeration = ({ dispatch }) => {
     console.log('auth', auth)
     const [resourcesState, setResources] = React.useState([])
     const [redirection, setRedirection] = React.useState(false)
+    const [needUpdate, setNeedUpdate] = React.useState(false)
+    const [resourceIndex, setResourceIndex] = React.useState("")
+
+
+    const manageContainerResource = (id, index, bool) => {
+        setOpenConfirm(!openConfirm)
+        setModalIndex(index)
+        setResourceIndex(id)
+    }
+
+
+
 
     const handleModerate = (id, bool) => {
         console.log('auth token', auth.token)
         console.log('id resource', id)
-
+        console.log('bool for moderation : isValidated or !isValidated && !isPublic', bool)
+        // setNeedUpdate(true)
         if (TokenManager.getRole(auth.token) == "ROLE_MODERATOR" && auth.user.role == "ROLE_MODERATOR" && auth.token && TokenManager.isModerator(auth.token) && _tokenIsValid(auth.token)) {
             moderateResource({ resource_id: id, bool }, auth.token).then(res => {
                 console.log(res)
@@ -52,31 +65,19 @@ const ResourceModeration = ({ dispatch }) => {
 
     }
 
+    console.log('resources', resources)
+
     // if(redirection) return (<Redirect to="/moderation/resources" />)
 
     // if(redi)
 
-    // React.useEffect(() => {
-    //     const fetchData = async () => {
-    //         dispatch({ type: resourcesTypes.loading })
-    //         const res = await findRessources()
-    //         console.log('res', res)
-    //         const resourcesData = res['hydra:member']
 
-    //         setResources(resourcesData)
-    //         dispatch({ type: resourcesTypes.getResources, data: resourcesData })
-    //         dispatch({ type: resourcesTypes.unload })
-
-    //     }
-    //     fetchData()
-    // }, [])
-
-    console.log('resources', resources)
 
     const [page, setPage] = React.useState(0);
     const [opensModalConfirmRow, setOpenModal] = React.useState([]);
 
     const [openConfirm, setOpenConfirm] = React.useState(false);
+    const [openContentsResource, setOpenContentsResource] = React.useState(false);
     const [modalIndex, setModalIndex] = React.useState(0);
 
     const optionsPerPage = [2, 4, 6]
@@ -103,6 +104,35 @@ const ResourceModeration = ({ dispatch }) => {
                     Moderation container
                 </Text>
 
+                <View>
+                    <Text>{resource.title} </Text>
+                    <Text>{resource.type.label} </Text>
+                </View>
+
+                {/* View content of the article */}
+                <View>
+                    <TouchableOpacity
+                        onPress={() => setOpenContentsResource(!openContentsResource)}
+                        style={styles.btnForDelete}
+                    >
+                        <Text style={styles.loginText}>View content</Text>
+                    </TouchableOpacity>
+
+                </View>
+
+                {openContentsResource && openConfirm &&
+                    resource.content && resource.content.length > 0 &&
+                    <View>
+                        {resource.content.map((cont) => [
+                            <View>
+                                {cont.attribute && cont.attribute.label && <Text styles={styles.attributeLabel}> {cont.attribute.label}  :  </Text>}
+                                <Text styles={styles.textValue}> {cont.textValue}</Text>
+                            </View>
+                        ])}
+
+                    </View>
+
+                }
 
                 <View style={styles.manageResource}>
                     <Button
@@ -126,6 +156,28 @@ const ResourceModeration = ({ dispatch }) => {
                             Valider
                         </Text>
                     </Button>
+
+                    {/* Delete button */}
+                    <View style={styles.espace}>
+                        <TouchableOpacity
+                            onPress={() => handleModerate(id, false)}
+                            style={styles.btnIsNotValidated}
+                        >
+                            <Text style={styles.loginText}>Refus&</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Validation button */}
+                    <View style={styles.espace}>
+                        <TouchableOpacity
+                            onPress={() => handleModerate(id, true)}
+                            style={styles.btnIsValidated}
+                        >
+                            <Text style={styles.loginText}>Validation</Text>
+                        </TouchableOpacity>
+                    </View>
+
+
                 </View>
 
                 <View>
@@ -155,7 +207,7 @@ const ResourceModeration = ({ dispatch }) => {
 
 
 
-            </View>
+            </View >
         )
 
     }
@@ -171,7 +223,6 @@ const ResourceModeration = ({ dispatch }) => {
                     <DataTable.Title numeric>Type</DataTable.Title>
                     <DataTable.Title numeric>Public</DataTable.Title>
                     <DataTable.Title numeric>Validé</DataTable.Title>
-                    <DataTable.Title >Manage</DataTable.Title>
 
                     {/* <DataTable.Title numeric>Fat</DataTable.Title> */}
                 </DataTable.Header>
@@ -202,19 +253,34 @@ const ResourceModeration = ({ dispatch }) => {
 
                                 <DataTable.Row>
                                     <DataTable.Cell>{resource.title}</DataTable.Cell>
-                                    <DataTable.Cell>{resource.author && resource.author.firstName}</DataTable.Cell>
+                                    <DataTable.Cell>{resource.author && resource.author.firstname
+                                        ? resource.author.firstname :
+                                        "Unknow"}
+                                    </DataTable.Cell>
 
-                                    <DataTable.Cell>{resource.type.label}</DataTable.Cell>
                                     <DataTable.Cell>{resource.type && resource.type.label}</DataTable.Cell>
                                     <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
                                     <DataTable.Cell>{resource.isValidated ? "Validé" : "Invisible"}</DataTable.Cell>
 
-
                                 </DataTable.Row>
 
-                                {
-                                    containerModerationRendering(resource)
-                                }
+
+                                <View>
+                                    <TouchableOpacity
+                                        onPress={() => manageContainerResource(id, index, true)}
+                                        style={styles.btnForDelete}
+                                    >
+                                        <Text style={styles.loginText}>Moderate</Text>
+                                    </TouchableOpacity>
+
+                                </View>
+
+                                {openConfirm && resourceIndex == id && modalIndex == index
+                                    &&
+                                    <View>
+                                        <Text> Container de modération</Text>
+                                        {containerModerationRendering(resource)}
+                                    </View>}
 
                             </View>
                         )
@@ -359,46 +425,52 @@ const styles = StyleSheet.create({
     },
     img: { width: 150, height: 150, marginTop: 20 },
     pan: { borderWidth: 1, borderRadius: 30, borderColor: 'gray', padding: 10, marginTop: 5, marginBottom: 5, flex: 0 },
+
+
+
     btnIsNotValidated: {
-        width: "120%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 40,
-        backgroundColor: "red",
+        width: 50,
         position: "absolute",
         top: 10,
         left: 15,
-        textAlign: 'left',
+        borderRadius: 25,
+        height: 50,
+        alignItems: "flex-start",
+        justifyContent: "center",
+        // marginTop: 40,
+        backgroundColor: "#FFA831",
     },
 
     btnIsValidated: {
         width: 50,
-        left: 1,
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 40,
         position: "absolute",
         top: 10,
         right: 15,
-        textAlign: 'right',
-        backgroundColor: "blue",
-
-    },
-
-
-
-    btnForDelete: {
-        width: "80%",
         borderRadius: 25,
         height: 50,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 40,
+        // marginTop: 40,
         backgroundColor: "#FFA831",
     },
 
+    btnForDelete: {
+        // width: "80%",
+        borderRadius: 25,
+        height: 50,
+        alignItems: "center",
+        justifyContent: "center",
+        // marginTop: 40,
+        backgroundColor: "#FFA831",
+    },
+
+    btnViewContent: {
+        // width: "80%",
+        borderRadius: 25,
+        height: 30,
+        alignItems: "center",
+        justifyContent: "center",
+        // marginTop: 40,
+        backgroundColor: "#FFA831",
+    },
 })
