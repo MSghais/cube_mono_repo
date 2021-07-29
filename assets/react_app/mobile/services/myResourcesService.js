@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import TokenManager from './security/TokenManager'
 export const resourcesTypes = {
     getResources: "GET_RESOURCES",
+    getCommmentsResource: "GET_COMMENT_RESOURCE",
     loading: "LOADING_RESOURCES",
     unload: "UNLOADING"
 }

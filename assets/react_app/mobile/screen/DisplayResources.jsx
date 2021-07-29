@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, FlatList, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ImageBackground, ActivityIndicator } from 'react-native'
 import { KEY_TOKEN, logoutAuth } from '../services/authService'
-import ResourcesCard from '../component/ResourcesCard'
+import ResourcesCard from '../component/post/ResourcesCard'
 import { connect, useSelector } from 'react-redux';
 import { findRessources, resourcesTypes } from '../services/myResourcesService'
 

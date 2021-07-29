@@ -14,7 +14,7 @@ function AuthHandler(state = initialState, action) {
 		case 'RESET_AUTH':
 			return initialState;
 
-		case 'LOADING':
+		case 'LOADING_AUTH':
 			nextState = { ...state, loading: true }
 			return nextState;
 

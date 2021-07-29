@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux';
-import { getCommmentsResource } from "../services/myResourcesService";
-import { Button, FlatList, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ImageBackground } from 'react-native'
-import FormComment from './FormComment';
+import { connect, useSelector } from 'react-redux';
+import { getCommmentsResource, resourcesTypes } from "../../services/myResourcesService";
+import { Button, FlatList, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ImageBackground, ActivityIndicator } from 'react-native'
+import { commentTypes } from '../../services/commentService';
 
-const CommentsDisplay = ({ resourceId, catchRefresh }) => {
+const CommentsDisplay = ({ resourceId, catchRefresh, dispatch }) => {
     const [comments, setComments] = useState([])
 
+    const auth = useSelector(state => state.auth)
+    const comment = useSelector(state => state.comment)
+
+    const [loaderFetch, setLoader] = useState(true)
     useEffect(() => {
         const init = async () => {
+            dispatch({ type: commentTypes.loading })
             let res = await getCommmentsResource(resourceId);
             console.log("res", res);
             // const newComment = res.data["hydra:member"];
             const newComment = res["hydra:member"];
             setComments(newComment);
+            setLoader(false)
+            dispatch({ type: commentTypes.unload })
+
         }
         init()
 
     }, [catchRefresh])
+
 
     console.log('comments', comments)
     const viewComment = (comment) => {
@@ -47,59 +56,50 @@ const CommentsDisplay = ({ resourceId, catchRefresh }) => {
 
     const [openComment, setComment] = React.useState(false)
 
+
+    if (comment.loading) {
+        return <ActivityIndicator />
+    }
     return (
         <ScrollView>
 
             <View style={styles.root}>
-                {console.log('RENDER', comments)}
-                <Text>Il y a {comments.length} commentaires : </Text>
 
                 {
                     comments.map(comment => (
-                        <View key={comment.id}
+                        <View
+                            key={comment.id}
                             style={styles.main}
                         >
                             <View>
                                 <Text className={styles.title} color="textSecondary" gutterBottom>
                                     Commenté le {`${new Date(comment.createdAt).getMonth()}/${new Date(comment.createdAt).getDate()}/${new Date(comment.createdAt).getFullYear()}`} par {comment.userEntity.firstname}
                                 </Text>
+
+                                <Text className={styles.title} color="textSecondary" gutterBottom>
+                                    Commenté le {`${new Date(comment.createdAt).getMonth()}/${new Date(comment.createdAt).getDate()}/${new Date(comment.createdAt).getFullYear()}`} par {comment.userEntity.firstname}
+                                </Text>
                                 <View
-                                //  style={styles.txt}
                                 >
                                     {comment.userEntity.firstname} says :
                                     <Text
                                         variant="body2"
                                         component="p"
-                                    // style={styles.textValue}
                                     >
                                         {comment.content}
                                     </Text>
 
+
+
+                                </View>
+
+                                <View>
+                                {<Text className={styles.title} color="textSecondary" gutterBottom>
+                                    Commenté le {`${new Date(comment.createdAt).getMonth()}/${new Date(comment.createdAt).getDate()}/${new Date(comment.createdAt).getFullYear()}`} par {comment.userEntity.firstname}
+                                </Text>}
                                 </View>
 
                             </View>
-
-{/* 
-                            <TouchableOpacity
-                                onPress={setComment(!openComment)} >
-                                <View
-                                    style={styles.btn}
-                                    title="Créer un commentaire">
-                                </View>
-                            </TouchableOpacity> */}
-
-                            {/* {openComment &&
-                                <View>
-                                    <FormComment
-                                        resourceId={resourceId}
-                                        commentId={comment.id}>
-                                    </FormComment>
-                                </View>
-                            } */}
-
-
-
-
                         </View>
                     ))
                 }
@@ -110,18 +110,17 @@ const CommentsDisplay = ({ resourceId, catchRefresh }) => {
     )
 }
 
-// const mapStateToProps = (state) => {
-//     return state
-// }
+const mapStateToProps = state => ({
+    auth: state.auth,
+    comment: state.comment
+});
 
-// export default connect(mapStateToProps)(CommentsDisplay)
-export default CommentsDisplay
+export default connect(mapStateToProps)(CommentsDisplay)
 
 const styles = StyleSheet.create({
     root: {
         minWidth: 275,
         flex: 1,
-        //backgroundColor: '#1C3041',
         alignItems: 'center',
         justifyContent: 'center',
     },

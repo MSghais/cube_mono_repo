@@ -1,17 +1,11 @@
 
 import React from 'react'
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect, useSelector } from 'react-redux';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput, ScrollView } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
-import { createComment } from "../services/commentService";
-import { moderateResource } from "../services/myResourcesService";
-import CommentDisplay from './CommentDisplay';
-import FormComment from './FormComment';
-import TokenHandler from '../services/security/TokenManager';
-
-// import displayComment from './displayComment';
+import { moderateResource } from "../../services/myResourcesService";
+import CommentDisplay from '../comment/CommentDisplay';
+import FormComment from '../form/FormComment';
+import TokenHandler from '../../services/security/TokenManager';
 export const KEY_TOKEN = 'token'
 
 const ResourceDetail = ({ navigation, route, state }) => {
@@ -47,70 +41,13 @@ const ResourceDetail = ({ navigation, route, state }) => {
 
     }
 
-    const containerModerationRendering = (resource) => {
-        const id = resource.id
-        return (
-
-            <View style={styles.containerModeration}>
-
-                <Text>
-                    Moderation container
-                </Text>
-
-                <View style={styles.manageResource}>
-                    <Button
-                        style={styles.btnIsNotValidated}
-                        onPress={() => handleModerate(id, false)}>
-                        <Text
-                            style={styles.txtButton}>
-                            Refuser
-                        </Text>
-                    </Button>
-
-                    <Button
-                        style={styles.btnIsNotValidated}
-                        onPress={() => handleModerate(id, true)}>
-                        <Text
-                            style={styles.txtButton}>
-                            Valider
-                        </Text>
-                    </Button>
-                </View>
-
-                <View>
-                    <Button
-                        style={styles.btnIsNotValidated}
-                        onPress={() => handleModerate(id, true)}
-                    >
-                        <Text
-                            style={styles.txtButton}>
-                            Delete
-                        </Text>
-                    </Button>
-                    {/* Delete button */}
-                    <View style={styles.espace}>
-                        <TouchableOpacity
-                            onPress={() => handleModerate(id, true)}
-                            style={styles.btnForDelete}
-                        >
-                            <Text style={styles.loginText}>Se Déconnecter</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
-
-            </View>
-        )
-
-    }
-
-
-
-
-
     return (
-        <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
-            <ScrollView style={styles.main}>
+        // <ImageBackground style={{ width: '100%', height: '100%' }}
+        // //  source={require("../../assets/background-vertical.png")}
+        //  >
+            <View 
+            style={styles.main}
+            >
 
                 <View style={styles.topLeft}>
 
@@ -169,11 +106,11 @@ const ResourceDetail = ({ navigation, route, state }) => {
                     />
                 </View>
 
-                {auth && auth.token && auth.user &&
+                {/* {auth && auth.token && auth.user &&
                     auth.token && auth.token.length > 0
                     && TokenHandler.isModerator(auth.token) && !TokenHandler.isExpired(auth.token)
                     && containerModerationRendering(resource)
-                }
+                } */}
 
                 <TouchableOpacity
                     onPress={handlePress} >
@@ -184,8 +121,8 @@ const ResourceDetail = ({ navigation, route, state }) => {
                     </View>
                 </TouchableOpacity>
 
-            </ScrollView>
-        </ImageBackground>
+            </View>
+        // </ImageBackground>
     )
 }
 

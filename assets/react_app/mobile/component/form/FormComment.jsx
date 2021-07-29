@@ -1,13 +1,8 @@
 
 import React from 'react'
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { Image, StyleSheet, Text, TouchableOpacity, View, Button, ImageBackground, TextInput } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
-import { createComment } from "../services/commentService";
-import CommentDisplay from './CommentDisplay';
-// import displayComment from './displayComment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createComment } from "../../services/commentService";
 export const KEY_TOKEN = 'token'
 export const USER_ID = 'USER_ID'
 
@@ -51,7 +46,7 @@ const FormComment = ({ resource, commentId }) => {
                 // resetComment()
             }
         })
-      
+
 
     }
 

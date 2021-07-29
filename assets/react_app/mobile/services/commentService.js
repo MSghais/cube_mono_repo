@@ -1,4 +1,10 @@
 import axios from "axios";
+export const commentTypes = {
+    getComment: "GET_COMMENT",
+    getCommmentsResource: "GET_COMMENT_RESOURCE",
+    loading: "LOADING_COMMENT",
+    unload: "UNLOADING_COMMENT"
+}
 
 export  function createComment(comment) {
     return axios
@@ -18,4 +24,17 @@ export  function createComment(comment) {
 
             return true;
         });
+}
+
+export function getCommmentsResource(resourceId) {
+
+    return axios
+        .get(`http://192.168.43.94:8002/api/resources/${resourceId}/comments`)
+        .then(response => response.data)
+        .catch(err => {
+            return {
+                status: 500,
+                message: err
+            }
+        });;
 }

@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import { Button, ImageBackground, TextInput, TouchableOpacity, StyleSheet, Text, View, Image } from 'react-native'
-import { loginAuth, KEY_TOKEN, logoutAuth, getUser } from '../services/authService'
-import TokenManager from '../services/security/TokenManager'
+import { connect, useSelector } from 'react-redux'
+import { Button, ImageBackground, TextInput, TouchableOpacity, StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native'
+import { loginAuth, KEY_TOKEN, logoutAuth, getUser } from '../../services/authService'
+import TokenManager from '../../services/security/TokenManager'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'
 
 
-const login = ({  route, dispatch }) => {
+const login = ({ route, dispatch }) => {
     const [email, setEmail] = useState('')
     const [pwd, setPwd] = useState('')
     const [token, setToken] = useState(null)
+    const auth = useSelector(state => state.auth)
 
     const navigation = useNavigation()
 
@@ -21,6 +22,7 @@ const login = ({  route, dispatch }) => {
                 username: email.toLowerCase(),
                 password: pwd
             }
+            dispatch({ type: "LOADING_AUTH" })
             loginAuth(data).then((response) => {
                 AsyncStorage.getItem(KEY_TOKEN).then((token) => {
                     console.log("token are : ", token)
@@ -44,7 +46,7 @@ const login = ({  route, dispatch }) => {
                             dispatch({ type: "SET_AUTH", auth });
 
                             if (auth.user.role && auth.user.role === 'ROLE_MODERATOR'
-                                
+
                                 && TokenManager.getRole(token) === 'ROLE_MODERATOR') {
                                 navigation.navigate('ResourceModeration')
 
@@ -72,10 +74,18 @@ const login = ({  route, dispatch }) => {
 
     }
 
+    if (auth.loading) {
+        return <ActivityIndicator />
+    }
+
     return (
-        <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
+        // <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
+        <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../../assets/background-vertical.png")}>
+
             {/* {console.log('RENDER', email, pwd, token)} */}
             <View style={styles.container}>
+
+                {auth.loading && <ActivityIndicator />}
 
                 <Text style={styles.titre}>Bienvenue</Text>
 

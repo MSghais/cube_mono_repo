@@ -4,7 +4,7 @@ import { DataTable } from 'react-native-paper';
 import { connect, useSelector } from 'react-redux';
 import { Image, StyleSheet, Text, Picker, TouchableOpacity, View, Button, ImageBackground, TextInput, ActivityIndicator, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-import { resourcesTypes, findRessources, moderateResource } from '../../services/myResourcesService';
+import { resourcesTypes, findRessources, moderateResource, getCommmentsResource } from '../../services/myResourcesService';
 import TokenManager from '../../services/security/TokenManager';
 import ModalConfirm from '../../component/modal/ModalConfirm';
 import { _tokenIsValid } from '../../services/authService';
@@ -67,6 +67,7 @@ const ResourceModeration = ({ dispatch }) => {
     const [openConfirm, setOpenConfirm] = React.useState(false);
     // view content of one ressources
     const [openContentsResource, setOpenContentsResource] = React.useState(false);
+    const [isOpenCommentManagement, setCommentManagement] = React.useState(false);
     const [modalIndex, setModalIndex] = React.useState(0);
 
     // for pagination after if needed ?
@@ -85,103 +86,110 @@ const ResourceModeration = ({ dispatch }) => {
     return (
 
         <View>
+            <ImageBackground style={{ width: '100%', height: '100%' }}
 
-            <DataTable>
-                <DataTable.Header>
-                    <DataTable.Title>Title</DataTable.Title>
-                    <DataTable.Title numeric>Username</DataTable.Title>
-                    <DataTable.Title numeric>Type</DataTable.Title>
-                    <DataTable.Title numeric>Public</DataTable.Title>
-                    <DataTable.Title numeric>Validé</DataTable.Title>
+            //  source={require("../../assets/background-vertical.png")}
+            >
 
-                    {/* <DataTable.Title numeric>Fat</DataTable.Title> */}
-                </DataTable.Header>
-                {/* {resources.loading && <ActivityIndicator />} */}
+                <DataTable>
+                    <DataTable.Header>
+                        <DataTable.Title>Title</DataTable.Title>
+                        <DataTable.Title numeric>Username</DataTable.Title>
+                        <DataTable.Title numeric>Type</DataTable.Title>
+                        <DataTable.Title numeric>Public</DataTable.Title>
+                        <DataTable.Title numeric>Validé</DataTable.Title>
 
-                {resources.data.length === 0 ?
-                    <View>
-                        <Text> No ressources to manage </Text>
-                    </View>
+                        {/* <DataTable.Title numeric>Fat</DataTable.Title> */}
+                    </DataTable.Header>
+                    {/* {resources.loading && <ActivityIndicator />} */}
 
-                    // : resourcesState.map((resource) => {
-                    : resources.data.map((resource, index) => {
-                        // console.log('resource to display', resource)
-                        const id = resource.id
-                        console.log('resource id ', id)
+                    {resources.data.length === 0 ?
+                        <View>
+                            <Text> No ressources to manage </Text>
+                        </View>
 
-                        const textModal = (
-                            <Text>
-                                {modalIndex == index && openConfirm ? "Close" : "Open"}
-                            </Text>
-                        )
+                        // : resourcesState.map((resource) => {
+                        : resources.data.map((resource, index) => {
+                            // console.log('resource to display', resource)
+                            const id = resource.id
+                            console.log('resource id ', id)
+
+                            const textModal = (
+                                <Text>
+                                    {modalIndex == index && openConfirm ? "Close" : "Open"}
+                                </Text>
+                            )
 
 
 
-                        const row = (
-
-                            <View>
-
-                                <DataTable.Row>
-                                    <DataTable.Cell>{resource.title}</DataTable.Cell>
-                                    <DataTable.Cell>{resource.author && resource.author.firstname
-                                        ? resource.author.firstname :
-                                        "Unknow"}
-                                    </DataTable.Cell>
-
-                                    <DataTable.Cell>{resource.type && resource.type.label}</DataTable.Cell>
-                                    <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
-                                    <DataTable.Cell>{resource.isValidated ? "Validé" : "Invisible"}</DataTable.Cell>
-
-                                </DataTable.Row>
-
+                            const row = (
 
                                 <View>
-                                    <TouchableOpacity
-                                        onPress={() => manageContainerResource(id, index, true)}
-                                        style={styles.btnForDelete}
-                                    >
-                                        <Text style={styles.loginText}>Moderate</Text>
-                                    </TouchableOpacity>
+
+                                    <DataTable.Row>
+                                        <DataTable.Cell>{resource.title}</DataTable.Cell>
+                                        <DataTable.Cell>{resource.author && resource.author.firstname
+                                            ? resource.author.firstname :
+                                            "Unknow"}
+                                        </DataTable.Cell>
+
+                                        <DataTable.Cell>{resource.type && resource.type.label}</DataTable.Cell>
+                                        <DataTable.Cell>{resource.isPublic ? "Public" : "In process"}</DataTable.Cell>
+                                        <DataTable.Cell>{resource.isValidated ? "Validé" : "Invisible"}</DataTable.Cell>
+
+                                    </DataTable.Row>
+
+
+                                    <View style={{ alignItems: 'center' }}>
+                                        <TouchableOpacity
+                                            onPress={() => manageContainerResource(id, index, true)}
+                                            style={styles.btnForDelete}
+                                        >
+                                            <Text style={styles.loginText}>Moderate</Text>
+                                        </TouchableOpacity>
+
+                                    </View>
+
+                                    {openConfirm && resourceIndex == id && modalIndex == index
+                                        &&
+                                        <View>
+                                            <Text> Container de modération</Text>
+                                            {/* {containerModerationRendering(resource)} */}
+                                            <ContainerModeration
+                                                setOpenContentsResource={setOpenContentsResource}
+                                                openContentsResource={openContentsResource}
+                                                resource={resource}
+                                                isOpenCommentManagement={isOpenCommentManagement}
+                                                setCommentManagement={setCommentManagement}
+                                                handleModerate={handleModerate}
+                                            />
+                                        </View>}
 
                                 </View>
-
-                                {openConfirm && resourceIndex == id && modalIndex == index
-                                    &&
-                                    <View>
-                                        <Text> Container de modération</Text>
-                                        {/* {containerModerationRendering(resource)} */}
-                                        <ContainerModeration 
-                                        setOpenContentsResource={setOpenContentsResource}
-                                        openContentsResource={openContentsResource}
-                                        resource={resource}
-                                        openConfirm={openConfirm}
-                                        handleModerate={handleModerate}
-                                        />
-                                    </View>}
-
-                            </View>
-                        )
+                            )
 
 
-                        return row
+                            return row
 
-                    })
+                        })
 
-                }
+                    }
 
 
-                <DataTable.Pagination
-                    page={page}
-                    numberOfPages={3}
-                    onPageChange={(page) => setPage(page)}
-                    label="1-2 of 6"
-                    optionsPerPage={optionsPerPage}
-                    itemsPerPage={itemsPerPage}
-                    setItemsPerPage={setItemsPerPage}
-                    showFastPagination
-                    optionsLabel={'Rows per page'}
-                />
-            </DataTable>
+                    <DataTable.Pagination
+                        page={page}
+                        numberOfPages={3}
+                        onPageChange={(page) => setPage(page)}
+                        label="1-2 of 6"
+                        optionsPerPage={optionsPerPage}
+                        itemsPerPage={itemsPerPage}
+                        setItemsPerPage={setItemsPerPage}
+                        showFastPagination
+                        optionsLabel={'Rows per page'}
+                    />
+                </DataTable>
+
+            </ImageBackground>
 
         </View>
 
@@ -228,7 +236,7 @@ const styles = StyleSheet.create({
         margin: 40,
         borderRadius: 10,
         flexDirection: "row",
-
+        width: "250px",
         // display:"flex",
         display: 'flex',
 
@@ -305,49 +313,25 @@ const styles = StyleSheet.create({
 
 
 
-    btnIsNotValidated: {
-        width: 60,
-        // position: "absolute",
-        top: 10,
-        left: 15,
+    btnForDelete: {
+        paddingHorizontal: 8,
+        paddingVertical: 6,
+        borderRadius: 4,
+        // backgroundColor: "oldlace",
+        alignSelf: "flex-start",
+        marginHorizontal: "1%",
+        marginBottom: 6,
+        minWidth: "48%",
+        textAlign: "center",
+        // width: "80%",
         // borderRadius: 25,
-        height: 50,
-        // alignItems: "flex-start",
-        // justifyContent: "center",
-        // marginTop: 40,
-        backgroundColor: "#97161b",
-    },
-
-    btnIsValidated: {
-        width: 60,
-        // position: "absolute",
-        top: 10,
-        right: 15,
-        borderRadius: 25,
-        height: 50,
+        // height: 50,
         // alignItems: "center",
         // justifyContent: "center",
         // marginTop: 40,
-        backgroundColor: "#4b6113",
-    },
-
-    btnForDelete: {
-        // width: "80%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        // marginTop: 40,
         backgroundColor: "#FFA831",
     },
 
-    btnViewContent: {
-        // width: "80%",
-        borderRadius: 25,
-        height: 30,
-        alignItems: "center",
-        justifyContent: "center",
-        // marginTop: 40,
-        backgroundColor: "#FFA831",
-    },
+
+
 })
