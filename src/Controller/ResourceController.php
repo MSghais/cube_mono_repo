@@ -16,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 
 use App\Repository\ResourceRepository;
+use App\Repository\CommentRepository;
 
 use App\Entity\Resource;
 
@@ -82,4 +83,43 @@ class ResourceController extends AbstractController
 	        ], 403);			
 		}
 	}
+
+		/**
+	 * @Route("/api/resources/moderate/comment", name="app_moderate_resource", methods={"POST"})
+	 * 
+	 * @IsGranted("ROLE_MODERATOR")
+	 * 
+	 * @param  ResourceUserStateRepository $repo
+	 */
+	public function moderateCommentResource(Request $request, ResourceRepository $repo, CommentRepository $comRepo) {
+		$content = json_decode($request->getContent(), true);
+
+		$resource = $repo->find($content["resource_id"]);
+		$em = $this->getDoctrine()->getManager();
+		$bool = $content["bool"];
+		$commentId = $content["commentId"];
+		if(!$commentId) {
+			return $this->json([
+	            'error' => "non existant commentId"
+	        ], 403);
+		}
+		$commentToDelete = $comRepo->findById($commentId);
+
+		if($resource) {
+			$resource->setIsValidated($bool);
+			if(!$bool) $resource->setIsPublic(false);
+			$em->persist($resource);
+			$em->flush();
+
+
+	        return $this->json([
+	            'resource' => $resource
+	        ], 200, [], ['groups' => 'read:resources']);
+		} else {
+	        return $this->json([
+	            'error' => "non existant resource"
+	        ], 403);			
+		}
+	}
+
 }

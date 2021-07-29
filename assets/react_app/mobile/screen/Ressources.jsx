@@ -14,6 +14,7 @@ const ResourcesDisplay = ({ navigation, route, token, dispatch, props }) => {
     const auth = useSelector(state => state.auth)
     const resource = useSelector(state => state.resource)
 
+
     useEffect(() => {
         const fetchData = async () => {
             const res = await findRessources()
@@ -29,11 +30,15 @@ const ResourcesDisplay = ({ navigation, route, token, dispatch, props }) => {
 
         fetchData()
     }, [])
+    if (resource.loading || !resourcesData || resourcesData.length == 0) {
+        return <View>
+            <ActivityIndicator />
+            <Text style={styles.titre}> Aucune resource disponible actuellement </Text>
+        </View>
+    }
     console.log(resource)
 
-    // if(resource.loading) {
-    //     return <ActivityIndicator/>
-    // }
+
 
     const logout = () => {
         console.log("adios")
@@ -54,8 +59,17 @@ const ResourcesDisplay = ({ navigation, route, token, dispatch, props }) => {
                 <Text style={styles.titre}>
                     Ressources
                 </Text>
+                {resourcesData.length === 0 || resource.loading || !resourcesData  &&
+
+                    <View>
+                        <ActivityIndicator />
+                        <Text style={styles.titre}> Aucune resource disponible actuellement </Text>
+                    </View>
+                }
 
                 <ScrollView>
+
+                    {resource.loading && <ActivityIndicator />}
 
                     {resource.data.length === 0
                         ? <Text style={styles.titre} > Aucune ressource disponible </Text>

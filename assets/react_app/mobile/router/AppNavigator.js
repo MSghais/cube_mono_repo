@@ -17,7 +17,7 @@ import ResourceModeration from '../screen/moderator/ResourceModeration';
 import TokenManager from '../services/security/TokenManager';
 
 // const Navigator = ({ dispatch, navigation }) => {
-const AppNavigator = ({ dispatch , navigation}) => {
+const AppNavigator = ({ dispatch, navigation }) => {
 
   const auth = useSelector(state => state.auth)
   // const navigation = useNavigation()
@@ -31,6 +31,11 @@ const AppNavigator = ({ dispatch , navigation}) => {
     if (!auth.token || typeof auth.token != 'string'
       && auth.loading && token && token.length > 0 && _tokenIsValid(token)) {
       // dispatch({ type: "LOADING", auth });
+
+      if (TokenManager.isExpired(token)) {
+        // Possible used reducer modal for alert to relogin for security purpose
+        alert("Please try to relogin because your jwt token are expired")
+      }
       _setAxiosToken(token)
       getUser(token).then((user) => {
         console.log("user are : ", user)
@@ -57,7 +62,11 @@ const AppNavigator = ({ dispatch , navigation}) => {
 
       }).catch(error => {
         console.log('error get user', error)
-        alert(error)
+
+        if (error.code == 401
+          && error.message == 'Expired JWT Token') {
+          alert("Please try to relogin because your jwt token are expired")
+        }
       })
     }
 
@@ -75,73 +84,73 @@ const AppNavigator = ({ dispatch , navigation}) => {
   // }
   return (
     // <ImageBackground style={{ width: '100%', height: '100%' }} source={require("../assets/background-vertical.png")}>
-      <NavigationContainer>
+    <NavigationContainer>
       {/* <View> */}
 
-        {/* {loadStorageToken} */}
-        <Stack.Screen
-          name="MyRessources"
-          component={MyRessources}
-          options={({ navigation, route }) => ({
-            headerRight: () => (
+      {/* {loadStorageToken} */}
+      <Stack.Screen
+        name="MyRessources"
+        component={MyRessources}
+        options={({ navigation, route }) => ({
+          headerRight: () => (
 
-              // token && token.length > 0 && typeof token == 'string' ?
-              auth && auth.token && auth.token.length > 0 ?
+            // token && token.length > 0 && typeof token == 'string' ?
+            auth && auth.token && auth.token.length > 0 ?
 
-                <View style={{ display: "inline-flex" }}>
+              <View style={{ display: "inline-flex" }}>
+                <Button
+                  style={styles.button}
+                  title="Profil"
+                  onPress={() => navigation.navigate('UserProfil')}
+                />
+
+                {auth.token && auth.token.length > 0 && typeof auth.token == 'string'
+                  && auth.user && auth.user.role === 'ROLE_MODERATOR' && TokenManager.getRole(auth.token) === 'ROLE_MODERATOR' &&
                   <Button
                     style={styles.button}
-                    title="Profil"
-                    onPress={() => navigation.navigate('UserProfil')}
+                    title="ResourceModeration"
+                    onPress={() => navigation.navigate('ResourceModeration')}
                   />
+                }
 
-                  {auth.token && auth.token.length > 0 && typeof auth.token == 'string'
-                    && auth.user && auth.user.role === 'ROLE_MODERATOR' && TokenManager.getRole(auth.token) === 'ROLE_MODERATOR' &&
-                    <Button
-                      style={styles.button}
-                      title="ResourceModeration"
-                      onPress={() => navigation.navigate('ResourceModeration')}
-                    />
-                  }
+              </View>
+              :
 
-                </View>
-                :
+              <View style={{ display: "inline-flex" }}>
+                <Button
+                  style={styles.button}
+                  title="Login"
+                  onPress={() => navigation.navigate('Login')}
+                />
+              </View>
 
-                <View style={{ display: "inline-flex" }}>
-                  <Button
-                    style={styles.button}
-                    title="Login"
-                    onPress={() => navigation.navigate('Login')}
-                  />
-                </View>
+          )
+        })}
+      />
 
-            )
-          })}
-        />
-
-        <Stack.Screen name="Resource">
-          {props => <Resource {...props} />}
-        </Stack.Screen>
+      <Stack.Screen name="Resource">
+        {props => <Resource {...props} />}
+      </Stack.Screen>
 
 
-        <Stack.Screen name="ResourceModeration">
-          {props => <ResourceModeration {...props} />}
-        </Stack.Screen>
+      <Stack.Screen name="ResourceModeration">
+        {props => <ResourceModeration {...props} />}
+      </Stack.Screen>
 
 
-        <Stack.Screen name="Login">
-          {props => <Login {...props} />}
-        </Stack.Screen>
+      <Stack.Screen name="Login">
+        {props => <Login {...props} />}
+      </Stack.Screen>
 
 
-        <Stack.Screen name="Profil">
-          {props => <UserProfil  {...props} />}
-        </Stack.Screen>
+      <Stack.Screen name="Profil">
+        {props => <UserProfil  {...props} />}
+      </Stack.Screen>
 
 
 
       {/* </View> */}
-      </NavigationContainer>
+    </NavigationContainer>
 
     // </ImageBackground>
 

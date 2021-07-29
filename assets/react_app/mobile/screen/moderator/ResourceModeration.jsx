@@ -132,6 +132,30 @@ const ResourceModeration = ({ dispatch }) => {
                             </Text>
                         )
 
+                        const containerModerationRendering = (resource) => (
+
+                            <View style={styles.manageResource}>
+
+
+                                <DataTable.Cell color="secondary" variant="contained">
+                                    <Button
+                                        style={styles.btnIsNotValidated}
+                                        onPress={() => handleModerate(id, false)}>
+                                        Refuser
+                                    </Button>
+                                </DataTable.Cell>
+
+
+                                <DataTable.Cell color="primary" onClick={() => handleModerate(id, true)} variant="contained">
+                                    <Button
+                                        style={styles.btnIsValidated}
+                                        onPress={() => handleModerate(id, true)}>
+                                        Valider
+                                    </Button>
+                                </DataTable.Cell>
+                            </View>
+                        )
+
                         const row = (
 
                             <View>
@@ -147,27 +171,20 @@ const ResourceModeration = ({ dispatch }) => {
 
                                     <View style={styles.manageResource}>
 
-                                        <DataTable.Cell>
-                                            {/* <Button onPress={() => <ModalConfirm handleModerate={(id) => handleModerate(id)} />}> */}
-                                            {/* <Button onPress={() => setOpenModal(opensModalConfirmRow[index] = opensModalConfirmRow[index])}> */}
-                                            <Button onPress={() => {
-                                                setOpenConfirm(openConfirm)
-                                                setModalIndex(index)
-                                            }}>
-
-                                                {textModal}
-                                            </Button>
-                                        </DataTable.Cell>
 
                                         <DataTable.Cell color="secondary" variant="contained">
-                                            <Button onPress={() => handleModerate(id, false)}>
+                                            <Button
+                                                style={styles.btnIsNotValidated}
+                                                onPress={() => handleModerate(id, false)}>
                                                 Refuser
                                             </Button>
                                         </DataTable.Cell>
 
 
                                         <DataTable.Cell color="primary" onClick={() => handleModerate(id, true)} variant="contained">
-                                            <Button onPress={() => handleModerate(true)}>
+                                            <Button
+                                                style={styles.btnIsValidated}
+                                                onPress={() => handleModerate(id, true)}>
                                                 Valider
                                             </Button>
                                         </DataTable.Cell>
@@ -175,9 +192,12 @@ const ResourceModeration = ({ dispatch }) => {
                                 </DataTable.Row>
                                 {
                                     openConfirm && modalIndex == index &&
-                                    <ModalConfirm 
-                                    id={id}
-                                    handleModerate={(id) => handleModerate(id)} />
+                                    <ModalConfirm
+                                        id={id}
+                                        handleModerate={(id) => handleModerate(id)} />
+                                }
+                                {openConfirm && modalIndex == index &&
+                                    containerModeration(resource.data[modalIndex])
                                 }
                             </View>
                         )
@@ -291,23 +311,27 @@ const styles = StyleSheet.create({
     },
     img: { width: 150, height: 150, marginTop: 20 },
     pan: { borderWidth: 1, borderRadius: 30, borderColor: 'gray', padding: 10, marginTop: 5, marginBottom: 5, flex: 0 },
-    btn: {
+    btnIsNotValidated: {
         width: "120%",
         borderRadius: 25,
         height: 50,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
-        backgroundColor: "#FFA831",
+        // backgroundColor: "#FFA831",
+        backgroundColor: "red",
+
     },
 
-    btnSubmit: {
+    btnIsValidated: {
         // width: "120%",
         borderRadius: 25,
         height: 50,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 40,
-        backgroundColor: "#FFA891",
+        // backgroundColor: "#FFA891",
+        backgroundColor: "blue",
+
     },
 })

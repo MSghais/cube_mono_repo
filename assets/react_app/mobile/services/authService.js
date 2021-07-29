@@ -5,7 +5,7 @@ export const KEY_TOKEN = 'token'
 
 export function loginAuth(credentials) {
     return axios
-        .post("http://192.168.0.16:8002/api/login_check", credentials)
+        .post("http://192.168.43.94:8002/api/login_check", credentials)
         .then(response =>
             response.data
         )
@@ -28,7 +28,7 @@ export function getUser(token) {
     _setAxiosToken(token)
 
     return axios
-        .get("http://192.168.0.16:8002/api/user")
+        .get("http://192.168.43.94:8002/api/user")
         .then(response =>
             response.data
         )
